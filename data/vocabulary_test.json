@@ -1,0 +1,119 @@
+[
+  {
+    "word": "deficit",
+    "pos": "noun",
+    "difficulty": 5,
+    "theme": "Economics",
+    "synonyms": "shortfall, shortage",
+    "definition_en": "The amount by which a sum of money falls short of the required or expected amount; a shortfall or deficiency.",
+    "example_sentence": "When government spending exceeds tax revenues, the resulting budget deficit must be financed by borrowing, which can increase interest rates and affect private investment."
+  },
+  {
+    "word": "equilibrium",
+    "pos": "noun",
+    "difficulty": 5,
+    "theme": "Physics",
+    "synonyms": "balance, stability",
+    "definition_en": "A state in which opposing forces or influences are balanced, resulting in a stable system where there is no net change.",
+    "example_sentence": "In a closed system, chemical equilibrium is reached when the rates of the forward and reverse reactions are equal, resulting in no net change in the concentrations of reactants and products."
+  },
+  {
+    "word": "proliferation",
+    "pos": "noun",
+    "difficulty": 5,
+    "theme": "Political Science",
+    "synonyms": "escalation, expansion",
+    "definition_en": "A rapid and often excessive increase in number or spread of something.",
+    "example_sentence": "International treaties aim to prevent the proliferation of nuclear weapons and related technology, promoting disarmament among existing nuclear powers."
+  },
+  {
+    "word": "corroborate",
+    "pos": "verb",
+    "difficulty": 5,
+    "theme": "History",
+    "synonyms": "confirm, substantiate",
+    "definition_en": "To confirm or give support to a statement, theory, or finding, often with additional evidence or authority.",
+    "example_sentence": "Newly discovered manuscripts from the monastery's archives corroborate the account of the city's founding that was previously dismissed by scholars as mere folklore."
+  },
+  {
+    "word": "apathy",
+    "pos": "noun",
+    "difficulty": 5,
+    "theme": "Psychology",
+    "synonyms": "indifference, lethargy",
+    "definition_en": "A lack of interest, enthusiasm, or concern, especially regarding matters of general importance or appeal.",
+    "example_sentence": "Widespread voter apathy can significantly undermine the legitimacy of democratic processes, as low turnout often reflects a general disillusionment with the political system."
+  },
+  {
+    "word": "culmination",
+    "pos": "noun",
+    "difficulty": 5,
+    "theme": "History",
+    "synonyms": "climax, pinnacle",
+    "definition_en": "The final point or climax of a process, event, or series of actions; the highest or most decisive point.",
+    "example_sentence": "The storming of the Bastille on July 14, 1789, is widely regarded as the culmination of the growing social and political unrest that triggered the French Revolution."
+  },
+  {
+    "word": "futile",
+    "pos": "adjective",
+    "difficulty": 5,
+    "theme": "History",
+    "synonyms": "fruitless, vain",
+    "definition_en": "Incapable of producing any useful result; pointless or having no effect.",
+    "example_sentence": "Historical analysis reveals that the peasant uprisings of the late medieval period were largely futile, as they lacked the centralized leadership and military resources to challenge the established feudal order."
+  },
+  {
+    "word": "engender",
+    "pos": "verb",
+    "difficulty": 5,
+    "theme": "Sociology",
+    "synonyms": "cause, produce",
+    "definition_en": "To cause or give rise to a feeling, situation, or condition.",
+    "example_sentence": "A government that is perceived as corrupt and unresponsive is likely to engender feelings of cynicism and alienation among its citizens."
+  },
+  {
+    "word": "resolutely",
+    "pos": "adverb",
+    "difficulty": 5,
+    "theme": "Political Science",
+    "synonyms": "steadfastly, determinedly",
+    "definition_en": "In a determined, purposeful, and unwavering manner.",
+    "example_sentence": "Despite overwhelming opposition from established political factions, the newly formed party resolutely pursued its agenda for comprehensive institutional reform."
+  },
+  {
+    "word": "indisputable",
+    "pos": "adjective",
+    "difficulty": 5,
+    "theme": "History",
+    "synonyms": "incontrovertible, irrefutable",
+    "definition_en": "Unable to be challenged or denied; not open to question or dispute because it is so obviously true.",
+    "example_sentence": "The discovery of the Rosetta Stone provided indisputable evidence for deciphering ancient Egyptian hieroglyphs, fundamentally changing the field of Egyptology."
+  },
+  {
+    "word": "disparate",
+    "pos": "adjective",
+    "difficulty": 5,
+    "theme": "Sociology",
+    "synonyms": "dissimilar, divergent",
+    "definition_en": "Fundamentally different or distinct in kind; entirely unalike.",
+    "example_sentence": "The study aimed to synthesize findings from a wide range of disparate sources to create a more holistic understanding of urban development."
+  },
+  {
+    "word": "rejuvenate",
+    "pos": "verb",
+    "difficulty": 5,
+    "theme": "Environmental Science",
+    "synonyms": "revitalize, regenerate",
+    "definition_en": "To make someone or something look or feel younger, fresher, or more lively; to restore to a former state or give new energy and vigor to.",
+    "example_sentence": "The comprehensive conservation plan aims to rejuvenate the degraded wetland ecosystem by reintroducing native flora and improving water flow dynamics."
+  },
+  {
+    "word": "belligerent",
+    "pos": "adjective",
+    "difficulty": 5,
+    "theme": "History",
+    "synonyms": "hostile, aggressive",
+    "definition_en": "Hostile and aggressive; engaged in war or conflict.",
+    "example_sentence": "Diplomats worked continuously to mediate between the belligerent factions before the border dispute escalated into full-scale war."
+  }
+]

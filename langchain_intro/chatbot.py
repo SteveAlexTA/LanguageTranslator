@@ -18,7 +18,7 @@ gemini_key = os.getenv("GEMINI_API_KEY")
 if not gemini_key:
     raise ValueError("GEMINI_API_KEY was not found in your .env file!")
 
-retriever = get_qdrant_retriever(csv_path="data/toefl_essential_vocabulary.csv", k=3)
+retriever = get_qdrant_retriever(k=3)
 
 review_template_str = """Your job is to use English data to answer questions related to English in language learning context.
 Use the following context to answer questions. Be as detailed, informative and accurate as possible, but don't make up any information that's not from the context. If you don't know an answer, say you don't know.
@@ -26,57 +26,32 @@ Use the following context to answer questions. Be as detailed, informative and a
 Context:
 {context}"""
 
-review_system_prompt = SystemMessagePromptTemplate(
-    prompt=PromptTemplate(
-        input_variables=["context"],
-        template=review_template_str,
-    )
-)
-
-review_human_prompt = HumanMessagePromptTemplate(
-    prompt=PromptTemplate(
-        input_variables=["question"],
-        template="{question}",
-    )
-)
-
-messages = [review_system_prompt, review_human_prompt]
-
 review_prompt_template = ChatPromptTemplate(
-    input_variables=["context", "question"],
-    messages=messages,
+    messages=[
+        SystemMessagePromptTemplate.from_template(review_template_str),
+        HumanMessagePromptTemplate.from_template("{question}"),
+    ]
 )
 
-# Initialize Gemini AI
 chat_model = ChatGoogleGenerativeAI(
     model="gemini-3.5-flash",
     temperature=0,
-    google_api_key=gemini_key 
+    google_api_key=os.getenv("GEMINI_API_KEY"),
 )
 
-output_parser = StrOutputParser()
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
 
-# Helper to format retrieved documents
-def format_docs(documents):
-    return "\n\n".join(doc.page_content for doc in documents)
-
-# Assemble Chain
+# RAG Chain
 rag_chain = (
-    {
-        "context": retriever | format_docs, 
-        "question": RunnablePassthrough()
-    }
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
     | review_prompt_template
     | chat_model
-    | output_parser
+    | StrOutputParser()
 )
 
-# 5. Run Question
 if __name__ == "__main__":
-    question = "What's five letters represent vowels"
-    print(f"Querying Qdrant for: '{question}'...\n")
-    
+    question = "Give me an explanation, a synonym and an example sentence for the word 'equilibrium'."
+    print(f"Question: '{question}'\n")
     response = rag_chain.invoke(question)
-    
-    print("--- AI RESPONSE ---")
     print(response)
