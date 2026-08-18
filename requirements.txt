@@ -1,6 +1,6 @@
 langchain-google-genai
 langchain-qdrant
 qdrant-client
-langchain-community
 langchain-core
 python-dotenv 
+pandas

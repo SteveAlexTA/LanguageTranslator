@@ -4,10 +4,10 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 
-
 dotenv.load_dotenv()
 
-def get_qdrant_retriever(collection_name="toefl_vocabulary", k=3):
+def get_qdrant_retriever(k=3):
+    collection_name = "ielts_writing_task_2_evaluation"
     client = QdrantClient(
         url=os.getenv("QDRANT_URL"),
         api_key=os.getenv("QDRANT_API_KEY"),
