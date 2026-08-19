@@ -19,7 +19,7 @@ if not gemini_key or not qdrant_url or not qdrant_api_key:
     raise ValueError("Missing GEMINI_API_KEY, QDRANT_URL, or QDRANT_API_KEY in .env file")
 
 # Define path to CSV file
-csv_path = "data/train.csv"
+csv_path = "data/test.csv"
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"Dataset not found at '{csv_path}'")
 
@@ -56,7 +56,8 @@ vector_store = QdrantVectorStore(
 )
 
 # Process CSV row-by-row in streaming batches 
-batch_size = 40
+batch_size = 15
+sleep_delay = 15
 chunk_count = 0
 for df_chunk in pd.read_csv(csv_path, chunksize=batch_size):
     chunk_count += 1
@@ -66,7 +67,7 @@ for df_chunk in pd.read_csv(csv_path, chunksize=batch_size):
     for _, row in df_chunk.iterrows():
         prompt_text = str(row.get("prompt", "")).strip()
         essay_text = str(row.get("essay", "")).strip()
-        evaluation_text = str(row.get("evaluation", "")).strip()
+        evaluation_text = str(row.get("evaluation", "")).strip()[:1200]
         try:
             band_score = float(row.get("band", 0.0))
         except (ValueError, TypeError):
@@ -82,7 +83,7 @@ for df_chunk in pd.read_csv(csv_path, chunksize=batch_size):
 
         # Store fillaterable attributes in metadata
         metadata = {
-            "source": "data/train.csv",
+            "source": "data/test.csv",
             "band": band_score,
         }
 
@@ -90,6 +91,17 @@ for df_chunk in pd.read_csv(csv_path, chunksize=batch_size):
 
     # Upload batch to Qdrant 
     if docs:
-        vector_store.add_documents(docs)
-        print(f"Uploaded {len(docs)} documents to Qdrant collection 'ielts_writing_task_2_evaluation'.")
-        time.sleep(1)
+        for attempt in range(5):
+            try:
+                vector_store.add_documents(docs)
+                print(f"Uploaded batch {chunk_count} ({len(docs)} documents)")
+                break
+            except Exception as e:
+                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                    backoff = 20 * (attempt + 1)
+                    print(f"Rate limit hit on batch {chunk_count}. Pausing {backoff}s before retry {attempt + 1}/5...")
+                    time.sleep(backoff)
+                else:
+                    raise e
+                    
+        time.sleep(sleep_delay)
