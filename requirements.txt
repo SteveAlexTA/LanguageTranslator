@@ -3,4 +3,5 @@ langchain-qdrant
 qdrant-client
 langchain-core
 python-dotenv 
+fastembed
 pandas

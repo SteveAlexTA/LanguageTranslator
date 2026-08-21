@@ -4,6 +4,7 @@ import dotenv
 import pandas as pd
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from embedding import FastEmbedWrapper
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams 
@@ -11,12 +12,11 @@ from qdrant_client.http.models import Distance, VectorParams
 dotenv.load_dotenv()
 
 # Load URL and API keys from .env
-gemini_key = os.getenv("GEMINI_API_KEY")
 qdrant_url = os.getenv("QDRANT_URL")
 qdrant_api_key = os.getenv("QDRANT_API_KEY")
 
-if not gemini_key or not qdrant_url or not qdrant_api_key:
-    raise ValueError("Missing GEMINI_API_KEY, QDRANT_URL, or QDRANT_API_KEY in .env file")
+if not qdrant_url or not qdrant_api_key:
+    raise ValueError("Missing QDRANT_URL or QDRANT_API_KEY in .env file")
 
 # Define path to CSV file
 csv_path = "data/test.csv"
@@ -25,6 +25,11 @@ if not os.path.exists(csv_path):
 
 collection_name = "ielts_writing_task_2_evaluation"
 
+# Initialize embeddings and verify vector size
+embeddings = FastEmbedWrapper(model_name="BAAI/bge-small-en-v1.5")
+sample_vector = embeddings.embed_query("test dimension verification")
+vector_size = len(sample_vector)
+
 # Connect to Qdrant Client 
 client = QdrantClient(
     url=qdrant_url,
@@ -32,22 +37,25 @@ client = QdrantClient(
     timeout=120,
 )
 
-embeddings = GoogleGenerativeAIEmbeddings(
-    model="gemini-embedding-2-preview",
-    google_api_key=gemini_key
-)
-
 # Create collection if no collection exists
 if not client.collection_exists(collection_name):
-    print(f"Collection '{collection_name}' not found. Creating collection...")
-    sample_vector = embeddings.embed_query("test dimension verification")
+    print(f"Creating collection '{collection_name}' with vector size {vector_size}.")
     client.create_collection(
         collection_name=collection_name,
-        vectors_config=VectorParams(size=len(sample_vector), distance=Distance.COSINE),
+        vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
     )
-    print(f"Collection '{collection_name}' created with vector size {len(sample_vector)}.")
 else:
-    print(f"Found existing collection '{collection_name}'. Proceeding to upload.")
+    collection_info = client.get_collection(collection_name)
+    existing_vector_size = collection_info.config.params.vectors.size
+    if existing_vector_size != vector_size:
+        print(f"Vector size mismatch ({existing_vector_size} vs {vector_size}), recreating collection.")
+        client.delete_collection(collection_name)
+        client.create_collection(
+            collection_name=collection_name,
+            vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
+        )
+    else:
+        print(f"Collection '{collection_name}' already exists with matching vector size {vector_size}.")
 
 vector_store = QdrantVectorStore(
     client=client,
@@ -55,14 +63,11 @@ vector_store = QdrantVectorStore(
     embedding=embeddings,
 )
 
-# Process CSV row-by-row in streaming batches 
-batch_size = 15
-sleep_delay = 15
+# Process data row-by-row in streaming batches 
+batch_size = 50
 chunk_count = 0
 for df_chunk in pd.read_csv(csv_path, chunksize=batch_size):
     chunk_count += 1
-    print(f"Processing chunk {chunk_count} with {len(df_chunk)} rows...")
-
     docs = []
     for _, row in df_chunk.iterrows():
         prompt_text = str(row.get("prompt", "")).strip()
@@ -83,25 +88,13 @@ for df_chunk in pd.read_csv(csv_path, chunksize=batch_size):
 
         # Store fillaterable attributes in metadata
         metadata = {
-            "source": "data/test.csv",
+            "source": csv_path,
             "band": band_score,
         }
 
         docs.append(Document(page_content=page_content, metadata=metadata))
 
-    # Upload batch to Qdrant 
     if docs:
-        for attempt in range(5):
-            try:
-                vector_store.add_documents(docs)
-                print(f"Uploaded batch {chunk_count} ({len(docs)} documents)")
-                break
-            except Exception as e:
-                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                    backoff = 20 * (attempt + 1)
-                    print(f"Rate limit hit on batch {chunk_count}. Pausing {backoff}s before retry {attempt + 1}/5...")
-                    time.sleep(backoff)
-                else:
-                    raise e
-                    
-        time.sleep(sleep_delay)
+        vector_store.add_documents(docs)
+        print(f"Uploaded batch {chunk_count} ({len(docs)} documents)")
+
