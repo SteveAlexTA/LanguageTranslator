@@ -1,6 +1,5 @@
 import os
 import dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from embedding import FastEmbedWrapper
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
